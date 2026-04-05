@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MakeBench Miniatures</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@100;200;300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:     #09090a;
+    --deep:    #111013;
+    --surface: #1a181c;
+    --warm:    #e8dcc8;
+    --gold:    #c9a060;
+    --gold-dim:#8a6c3e;
+    --blue:    #3d6b8f;
+    --muted:   #6a6068;
+    --border:  rgba(201,160,96,0.18);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--warm);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 3rem;
+    background: linear-gradient(to bottom, rgba(9,9,10,0.95) 0%, transparent 100%);
+  }
+
+  .nav-logo {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.8rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .nav-links {
+    display: flex; gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.3s, color 0.3s;
+  }
+
+  .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    height: 100vh; min-height: 640px;
+    display: flex; align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .hero-img {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(9,9,10,0.2) 0%, rgba(9,9,10,0.0) 30%, rgba(9,9,10,0.7) 70%, rgba(9,9,10,1) 100%),
+      linear-gradient(to right, rgba(9,9,10,0.5) 0%, transparent 60%);
+    /* ↓ replace with your hero image URL */
+    background-image:
+      linear-gradient(to bottom, rgba(9,9,10,0.15) 0%, rgba(9,9,10,0.0) 30%, rgba(9,9,10,0.72) 70%, rgba(9,9,10,1) 100%),
+      url('hero.jpg');
+    background-size: cover;
+    background-position: center 40%;
+    transform: scale(1.03);
+    animation: heroReveal 2s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+
+  /* placeholder gradient for hero when no image is set */
+  .hero-img.placeholder {
+    background:
+      linear-gradient(to bottom, rgba(9,9,10,0.1) 0%, rgba(9,9,10,0.0) 30%, rgba(9,9,10,0.75) 70%, rgba(9,9,10,1) 100%),
+      radial-gradient(ellipse at 60% 40%, #1e2d3d 0%, #0d1117 40%, #09090a 100%);
+  }
+
+  @keyframes heroReveal {
+    from { transform: scale(1.08); opacity: 0; }
+    to   { transform: scale(1.03); opacity: 1; }
+  }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 0 3rem 5rem;
+    max-width: 720px;
+    animation: heroText 1.8s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+  }
+
+  @keyframes heroText {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(3rem, 7vw, 6rem);
+    line-height: 1.0;
+    color: var(--warm);
+    margin-bottom: 1rem;
+  }
+
+  .hero-tagline {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+    color: var(--gold);
+    margin-bottom: 1.8rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-sub {
+    font-size: 0.95rem;
+    color: rgba(232,220,200,0.65);
+    max-width: 480px;
+    line-height: 1.75;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 2rem; right: 3rem;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 0.8rem;
+    writing-mode: vertical-rl;
+    animation: fadeIn 2s 1.5s both;
+  }
+
+  .hero-scroll::before {
+    content: '';
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--gold-dim));
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 5rem 3rem; }
+
+  .section-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.65rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 3rem;
+    display: flex; align-items: center; gap: 1.5rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1; max-width: 80px;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FEATURED PIECE ── */
+  .featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 3rem;
+  }
+
+  .featured-img-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .featured-img-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--border);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .featured-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    background: var(--surface);
+  }
+
+  .featured-img-wrap:hover .featured-img { transform: scale(1.04); }
+
+  .featured-text {}
+
+  .piece-number {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold-dim);
+    margin-bottom: 1rem;
+  }
+
+  .featured-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .piece-series {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+
+  .piece-desc {
+    color: rgba(232,220,200,0.65);
+    font-size: 0.95rem;
+    line-height: 1.85;
+    margin-bottom: 2rem;
+  }
+
+  .piece-tag {
+    display: inline-block;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.8rem;
+    color: var(--muted);
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── GALLERY GRID ── */
+  .gallery-section {
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gallery-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .gallery-grid {
+    columns: 3;
+    column-gap: 1.2rem;
+  }
+
+  @media (max-width: 900px) { .gallery-grid { columns: 2; } }
+  @media (max-width: 560px) { .gallery-grid { columns: 1; } }
+
+  .gallery-item {
+    break-inside: avoid;
+    margin-bottom: 1.2rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .gallery-item::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(9,9,10,0.85) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .gallery-item:hover::after { opacity: 1; }
+
+  .gallery-item img {
+    width: 100%;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    background: var(--surface);
+  }
+
+  .gallery-item:hover img { transform: scale(1.04); }
+
+  .gallery-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 1rem 1.2rem;
+    z-index: 2;
+    transform: translateY(6px);
+    opacity: 0;
+    transition: all 0.4s;
+  }
+
+  .gallery-item:hover .gallery-caption {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .gallery-caption-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--warm);
+    display: block;
+  }
+
+  .gallery-caption-series {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.58rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  /* ── PLACEHOLDER IMAGE CARD ── */
+  .img-placeholder {
+    width: 100%; display: block;
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 2rem 1rem;
+    border: 1px dashed rgba(201,160,96,0.15);
+  }
+
+  .img-placeholder .ph-name {
+    color: rgba(232,220,200,0.4);
+    font-size: 0.65rem;
+  }
+
+  /* ── PROCESS SECTION ── */
+  .process-section {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .process-img-wrap { position: relative; }
+
+  .process-img {
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    background: var(--surface);
+  }
+
+  .process-img-wrap::before {
+    content: '';
+    position: absolute; inset: -1px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .process-text { padding-top: 1rem; }
+
+  .process-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+
+  .process-body {
+    color: rgba(232,220,200,0.65);
+    font-size: 0.95rem;
+    line-height: 1.85;
+    margin-bottom: 1.5rem;
+  }
+
+  .process-tools {
+    list-style: none;
+    margin-top: 2rem;
+  }
+
+  .process-tools li {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: rgba(232,220,200,0.7);
+  }
+
+  .process-tools li:first-child { border-top: 1px solid var(--border); }
+
+  .tool-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    min-width: 80px;
+    padding-top: 0.2rem;
+  }
+
+  /* ── ABOUT ── */
+  .about-section {
+    border-top: 1px solid var(--border);
+    background: var(--deep);
+  }
+
+  .about-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .about-quote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.3;
+    color: var(--warm);
+    margin-bottom: 3rem;
+    padding-left: 2rem;
+    border-left: 2px solid var(--gold);
+  }
+
+  .about-body {
+    color: rgba(232,220,200,0.65);
+    font-size: 0.98rem;
+    line-height: 1.9;
+    margin-bottom: 1.5rem;
+  }
+
+  .about-body strong {
+    color: var(--warm);
+    font-weight: 400;
+  }
+
+  /* ── CONTACT ── */
+  .contact-section {
+    text-align: center;
+    padding: 6rem 3rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .contact-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    margin-bottom: 1rem;
+  }
+
+  .contact-sub {
+    font-size: 0.95rem;
+    color: rgba(232,220,200,0.55);
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-link {
+    display: inline-block;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid var(--gold-dim);
+    padding: 0.9rem 2.5rem;
+    transition: all 0.3s;
+  }
+
+  .contact-link:hover {
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 2rem 3rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  .footer-copy {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+
+  .footer-location {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 40px; height: 1px;
+    background: var(--gold-dim);
+    margin: 2.5rem 0;
+  }
+
+  /* ── ANIMATE ON SCROLL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .featured { grid-template-columns: 1fr; gap: 2.5rem; padding: 4rem 1.5rem; }
+    .process-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">MakeBench Miniatures</div>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <!-- Replace HERO_IMAGE.jpg with your black townhouse photo filename -->
+  <!-- Source file: 19_garden_courtyard_diorama.jpg → rename to hero.jpg -->
+  <div class="hero-img"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Catonsville, Maryland &nbsp;·&nbsp; Est. 2020</p>
+    <h1 class="hero-title">MakeBench<br>Miniatures</h1>
+    <p class="hero-tagline">Small Scales. Real Stories.</p>
+    <p class="hero-sub">A one-person studio in Catonsville, Maryland, building handcrafted miniature worlds at 1:12 scale. Each piece is made from wood, resin, light, and the kind of detail that makes you lean in closer.</p>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- FEATURED: MIDNIGHT DEADLINE -->
+<section id="work" style="padding: 6rem 3rem 0;">
+  <div class="featured">
+    <div class="featured-img-wrap reveal">
+      
+      <!-- Source file: 32_gentleman_study_closeup.jpg → rename to featured-midnight-deadline.jpg -->
+      <img src="featured-midnight-deadline.jpg" alt="The Midnight Deadline — MakeBench University law office interior" class="featured-img">
+    </div>
+    <div class="featured-text reveal reveal-delay-1">
+      <p class="piece-number">Featured Work &nbsp;/&nbsp; 01</p>
+      <h2 class="featured-title">The Midnight<br>Deadline</h2>
+      <p class="piece-series">MakeBench University School of Law Series</p>
+      <p class="piece-desc">A late-night law office, frozen just before the deadline hits. The MakeBench University diploma hangs above the desk. The laptop glows. The TV is on. The iron safe, the tufted chair, the stacked files: every object has a story, and none of them are going home anytime soon.</p>
+      <div>
+        <span class="piece-tag">Functional Electronics</span>
+        <span class="piece-tag">3D Printed Elements</span>
+        <span class="piece-tag">LED Integration</span>
+        <span class="piece-tag">World-Building</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED: OYSTER SHELL (reversed) -->
+<section style="padding: 3rem 3rem 0;">
+  <div class="featured" style="direction: rtl;">
+    <div class="featured-img-wrap reveal" style="direction: ltr;">
+      
+      <!-- Source file: 15_oyster_shell_vignette.jpg → rename to featured-oyster-shell.jpg -->
+      <img src="featured-oyster-shell.jpg" alt="Tidewater Vignette — oyster shell miniature scene" class="featured-img">
+    </div>
+    <div class="featured-text reveal reveal-delay-1" style="direction: ltr;">
+      <p class="piece-number">Featured Work &nbsp;/&nbsp; 02</p>
+      <h2 class="featured-title">Tidewater<br>Vignette</h2>
+      <p class="piece-series">Objects & Curiosities</p>
+      <p class="piece-desc">An oyster shell becomes a landscape. A turned obsidian vessel sits among lichen, driftwood, and a resin-pooled shore. Photographed against black so nothing competes with the scene. A complete world that fits in your hand.</p>
+      <div>
+        <span class="piece-tag">Mixed Media</span>
+        <span class="piece-tag">Natural Materials</span>
+        <span class="piece-tag">Resin Work</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY GRID -->
+<section class="gallery-section" id="gallery" style="padding: 5rem 3rem;">
+  <div class="gallery-inner">
+    <div class="section-label reveal">Portfolio</div>
+    <div class="gallery-grid">
+
+      <!-- 1: McSorley's -->
+      <!-- Source file: 10_mcsorleys_exterior_finished.jpg → rename to gallery-mcsorleys.jpg -->
+      <div class="gallery-item reveal">
+        
+        <img src="gallery-mcsorleys.jpg" alt="McSorley's Old Ale House exterior" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">McSorley's Old Ale House</span>
+          <span class="gallery-caption-series">NYC Landmarks Series</span>
+        </div>
+      </div>
+
+      <!-- 2: Gothic bookshelf amber -->
+      <!-- Source file: 23_gothic_bookshelf_closeup.jpg → rename to gallery-gothic-bookshelf.jpg -->
+      <div class="gallery-item reveal reveal-delay-1">
+        
+        <img src="gallery-gothic-bookshelf.jpg" alt="Gothic bookshelf with amber arch glow" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">The Amber Library</span>
+          <span class="gallery-caption-series">Fragments of Family Folklore</span>
+        </div>
+      </div>
+
+      <!-- 3: Sugar Shack -->
+      <!-- Source file: 12_sugar_shack_lantern.jpg → rename to gallery-sugar-shack.jpg -->
+      <div class="gallery-item reveal reveal-delay-2">
+        
+        <img src="gallery-sugar-shack.jpg" alt="Sugar Shack lantern miniature" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">The Sugar Shack</span>
+          <span class="gallery-caption-series">Lantern Series</span>
+        </div>
+      </div>
+
+      <!-- 4: Gothic stained glass room -->
+      <!-- Source file: 21_stained_glass_reading_corner.jpg → rename to gallery-gothic-room.jpg -->
+      <div class="gallery-item reveal">
+        
+        <img src="gallery-gothic-room.jpg" alt="Gothic room with pink stained glass window" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">The Reading Chair</span>
+          <span class="gallery-caption-series">Stained Glass Series</span>
+        </div>
+      </div>
+
+      <!-- 5: Arched window bedroom -->
+      <!-- Source file: 11_miniature_bedroom_arched_window.jpg → rename to gallery-arched-bedroom.jpg -->
+      <div class="gallery-item reveal reveal-delay-1">
+        
+        <img src="gallery-arched-bedroom.jpg" alt="Bedroom with arched Palladian window and Persian rug" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">The Reading Room</span>
+          <span class="gallery-caption-series">Domestic Interiors</span>
+        </div>
+      </div>
+
+      <!-- 6: Apothecary cabinet -->
+      <!-- Source file: 14_apothecary_cabinet_books.jpg → rename to gallery-barn-jar.jpg -->
+      <div class="gallery-item reveal reveal-delay-2">
+        
+        <img src="gallery-barn-jar.jpg" alt="Red barn terrarium inside a glass jar" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">The Apothecary</span>
+          <span class="gallery-caption-series">Objects and Curiosities</span>
+        </div>
+      </div>
+
+      <!-- 7: Graham Family living room -->
+      <!-- Source file: 08_fireplace_sitting_room.jpg → rename to gallery-graham-living-room.jpg -->
+      <div class="gallery-item reveal">
+        
+        <img src="gallery-graham-living-room.jpg" alt="Graham Family living room with Levi chair and fireplace" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">Home Sweet Home</span>
+          <span class="gallery-caption-series">Fragments of Family Folklore</span>
+        </div>
+      </div>
+
+      <!-- 8: Phone Booth lit exterior -->
+      <!-- Source file: 22_phone_booth_exterior_lit.jpg → rename to gallery-phone-booth-lit.jpg -->
+      <div class="gallery-item reveal reveal-delay-1">
+        
+        <img src="gallery-phone-booth-lit.jpg" alt="Miniature British telephone booth glowing amber at night" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">Ring, If You Find This</span>
+          <span class="gallery-caption-series">London After Dark</span>
+        </div>
+      </div>
+
+      <!-- 9: Gentleman's study wide -->
+      <!-- Source file: 31_gentleman_study_wide.jpg → rename to gallery-midnight-blue.jpg -->
+      <div class="gallery-item reveal reveal-delay-2">
+        
+        <img src="gallery-midnight-blue.jpg" alt="The Midnight Deadline law office with blue ceiling glow" style="width:100%;display:block;">
+        <div class="gallery-caption">
+          <span class="gallery-caption-title">The Midnight Deadline</span>
+          <span class="gallery-caption-series">MakeBench University Series</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" style="padding: 6rem 3rem;">
+  <div class="process-section">
+    <div class="section-label reveal">The Method</div>
+    <div class="process-grid">
+      <div class="process-img-wrap reveal">
+        <!-- Source file: 27_miniature_wood_plank_strips.jpg → rename to process-wood-planks.jpg -->
+        <img src="process-wood-planks.jpg" alt="Miniature hardwood floor planks laid out in progress on the workbench" class="process-img">
+      </div>
+      <div class="process-text reveal reveal-delay-1">
+        <h2 class="process-title">High-Tech Meets<br>Hand-Craft</h2>
+        <p class="process-body">Every MakeBench piece starts on a workbench in Catonsville, Maryland. Where it ends up is somewhere between history and imagination. The studio does not choose between traditional craft and modern technology. It uses both, fully.</p>
+        <p class="process-body">Each plank of miniature hardwood flooring is cut, stained, and laid by hand. Each architectural component is engineered in CAD and printed with micron-level precision. Each light source is wired, coded, and calibrated to tell the right story at the right hour.</p>
+        <ul class="process-tools">
+          <li>
+            <span class="tool-label">3D Print</span>
+            <span>FLASHFORGE Adventurer 5M Pro for custom architectural components, furniture forms, and structural elements</span>
+          </li>
+          <li>
+            <span class="tool-label">Artisan</span>
+            <span>Balsa and basswood construction, professional airbrushing, hand-applied weathering and patina</span>
+          </li>
+          <li>
+            <span class="tool-label">Electronics</span>
+            <span>Custom-coded LED matrices, functional miniature displays, and embedded smart lighting systems</span>
+          </li>
+          <li>
+            <span class="tool-label">Scale</span>
+            <span>1:12 — one inch represents one foot — the language of serious miniature craft</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about" style="padding: 6rem 3rem;">
+  <div class="about-inner">
+    <div class="section-label reveal">The Studio</div>
+    <blockquote class="about-quote reveal">
+      "The goal is never just to replicate a room. It is to capture a moment, a feeling, a fragment of time that deserves to be kept."
+    </blockquote>
+    <div class="divider reveal"></div>
+    <p class="about-body reveal">
+      MakeBench Miniatures started in 2020 on a single workbench in Catonsville, Maryland, during the quietest stretch of the pandemic. What began as a way to stay focused and make something real has grown into a full creative practice, one that takes history, personal memory, and technology seriously at 1:12 scale.
+    </p>
+    <p class="about-body reveal reveal-delay-1">
+      The studio is <strong>Aaron Graham</strong>'s. He is a non-practicing attorney and higher education professional who has been building miniatures long enough to have a system and an aesthetic. The <strong>Fragments of Family Folklore</strong> series is the most personal part of the work: each piece preserves a real story, a real memory, in a form you can hold and look at up close.
+    </p>
+    <p class="about-body reveal reveal-delay-2">
+      The studio is rooted in the Maryland maker community, and the work reflects that: hands-on, patient, and built to last. The belief driving all of it is simple enough. With the right tools and enough care, you can fit something true into the palm of your hand.
+    </p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <p class="section-label reveal" style="justify-content: center;">Get in Touch</p>
+  <h2 class="contact-title reveal">Let's Talk About<br><em>Your</em> World</h2>
+  <p class="contact-sub reveal reveal-delay-1">Commission work, collaborations, and questions are all welcome.</p>
+  <!-- Replace the href with your actual email address -->
+  <a class="contact-link reveal reveal-delay-2" href="/cdn-cgi/l/email-protection#244c4148484b6449454f4146414a474c494d4a4d4550515641570a474b49"><span class="__cf_email__" data-cfemail="91f9f4fdfdfed1fcf0faf4f3f4fff2f9fcf8fff8f0e5e4e3f4e2bff2fefc">[email&#160;protected]</span></a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">MakeBench Miniatures</div>
+  <div class="footer-copy">&copy; 2025 Aaron Graham. All rights reserved.</div>
+  <div class="footer-location">Catonsville, Maryland</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Fallback: if nothing has become visible within 1.5s (common on local files),
+    // reveal everything so content is never permanently hidden
+    setTimeout(() => {
+      reveals.forEach(el => {
+        if (!el.classList.contains('visible')) el.classList.add('visible');
+      });
+    }, 1500);
+  } else {
+    reveals.forEach(el => el.classList.add('visible'));
+  }
+
+  // Hero image
+  // Hero image: loaded via CSS background-image url('hero.jpg') — no JS needed
+</script>
+</body>
+</html>
